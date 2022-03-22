@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ProfileScreen</string>
+    <string name="balance_name">Ваш баланс</string>
+    <string name="home_name">Личный кабинет</string>
+    <string name="send_money">ПОПОЛНИТЬ</string>
+    <string name="tariff">Тариф</string>
+    <string name="user">Пользователь</string>
+</resources>

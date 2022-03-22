@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainUserCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <ImageView
+        android:id="@+id/infoIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="13dp"
+        app:layout_constraintBottom_toBottomOf="@id/mainUserCard"
+        app:layout_constraintStart_toStartOf="@id/mainUserCard"
+        app:layout_constraintTop_toTopOf="@id/mainUserCard">
+
+    </ImageView>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/personInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="13dp"
+        app:layout_constraintBottom_toBottomOf="@id/infoIcon"
+        app:layout_constraintLeft_toRightOf="@id/infoIcon"
+        app:layout_constraintTop_toTopOf="@id/infoIcon"
+        tools:text="Иванов Иван Иванович">
+    </com.google.android.material.textview.MaterialTextView>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="13dp"
+        android:background="@color/gray"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
