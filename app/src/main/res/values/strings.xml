@@ -5,4 +5,8 @@
     <string name="send_money">ПОПОЛНИТЬ</string>
     <string name="tariff">Тариф</string>
     <string name="user">Пользователь</string>
+    <string name="services_list">Доступные услуги</string>
+    <string name="money_string">%.2f ₽</string>
+    <string name="to_pay">К оплате за %s: %.2f ₽</string>
+    <string name="money_string_int">%d ₽</string>
 </resources>

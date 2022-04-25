@@ -1,5 +1,6 @@
 package com.example.profilescreen.ui.main
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,18 +11,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.profilescreen.R
 
 class TariffAdapter :
-    ListAdapter<TariffInformation, TariffAdapter.ViewHolder>(TariffDiffCallback()) {
+    ListAdapter<Tariff, TariffAdapter.ViewHolder>(TariffDiffCallback()) {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tariffName = view.findViewById<TextView>(R.id.tariffName)
         val tariffSpeed = view.findViewById<TextView>(R.id.tariffDescription)
         val tariffPrice = view.findViewById<TextView>(R.id.price)
         val underline = view.findViewById<View>(R.id.divider)
+        private val context: Context = view.context
 
-        fun bind(tariffInformation: TariffInformation, isLastItem: Boolean) {
-            tariffName.text = tariffInformation.tariffName
-            tariffSpeed.text = tariffInformation.tariffSpeed
-            tariffPrice.text = tariffInformation.tariffCost
+        fun bind(tariff: Tariff, isLastItem: Boolean) {
+            tariffName.text = tariff.name
+            tariffPrice.text = context.getString(R.string.money_string_int, tariff.amount.toInt())
+            tariffSpeed.text = tariff.description
 
             if (isLastItem){
                 underline.visibility = View.GONE
@@ -43,12 +45,12 @@ class TariffAdapter :
     }
 }
 
-class TariffDiffCallback : DiffUtil.ItemCallback<TariffInformation>() {
-    override fun areItemsTheSame(oldItem: TariffInformation, newItem: TariffInformation): Boolean =
+class TariffDiffCallback : DiffUtil.ItemCallback<Tariff>() {
+    override fun areItemsTheSame(oldItem: Tariff, newItem: Tariff): Boolean =
         oldItem.id == newItem.id
 
     override fun areContentsTheSame(
-        oldItem: TariffInformation,
-        newItem: TariffInformation
+        oldItem: Tariff,
+        newItem: Tariff
     ): Boolean = oldItem == newItem
 }

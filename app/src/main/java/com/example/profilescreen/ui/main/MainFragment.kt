@@ -9,6 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.profilescreen.R
+import com.example.profilescreen.api.RetrofitClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 class MainFragment : Fragment() {
 
@@ -16,11 +21,11 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 
+    private lateinit var viewGlobal: View
     private lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         return inflater.inflate(R.layout.main_fragment, container, false)
@@ -31,53 +36,67 @@ class MainFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewGlobal = view
 
-        val balanceId = view.findViewById<TextView>(R.id.idNumber)
-        balanceId.text = "ЛС: 11001010100"
-        val balanceNumber = view.findViewById<TextView>(R.id.balanceNumber)
-        balanceNumber.text = "100.42 Р"
-        val debt = view.findViewById<TextView>(R.id.debtNumber)
-        debt.text = "К оплате за сентябрь 0.00 Р"
+        CoroutineScope(Dispatchers.IO).launch {
+            setAccountData(RetrofitClient.retrofitService.getBalanceList());
+        }
 
-        val tariffView = view.findViewById<RecyclerView>(R.id.tariffCards)
-        val tariffAdapter = TariffAdapter()
-        tariffAdapter.submitList(
-            mutableListOf(
-                TariffInformation(
-                    1,
-                    "Тариф \"Улыбка\"",
-                    "Скорость до 100 Мбит/с",
-                    "0 Р/мес"
-                ),
-                TariffInformation(
-                    2,
-                    "Тариф \"Улыбка\"",
-                    "Скорость до 100 Мбит/с",
-                    "0 Р/мес"
-                ),
-            )
-        )
-        tariffView.adapter = tariffAdapter
+        CoroutineScope(Dispatchers.IO).launch {
+            setTariffs(RetrofitClient.retrofitService.getTariffsList());
+        }
 
-        val userView = view.findViewById<RecyclerView>(R.id.userInfo)
-        val userAdapter = UserAdapter()
-        userAdapter.submitList(
-            mutableListOf(
-                UserInformation(
-                    1,
-                    R.drawable.ic_person,
-                    "Иванов Иван Иваныч"
-                ),
-                UserInformation(
-                    2,
-                    R.drawable.outline_house_24,
-                    "Сахалин, ул. Пушкина, д. Колотушкина"
-                ),
-                UserInformation(3, R.drawable.outline_list_24, "Доступные услуги")
-            )
-        )
-        userView.adapter = userAdapter
+        CoroutineScope(Dispatchers.IO).launch {
+            setUser(RetrofitClient.retrofitService.getUserList());
+        }
     }
+
+    private fun setUser(userList: List<User>) {
+        activity?.runOnUiThread {
+            val recyclerViewButtons = viewGlobal.findViewById<RecyclerView>(R.id.userInfo)
+            val adapter = UserCardAdapter()
+            adapter.submitList(mutableListOf(
+                UserCard(
+                    id = 1,
+                    icon = R.drawable.ic_person,
+                    text = userList[0].firstName.plus(" ").plus(userList[0].lastName)
+                ),
+                UserCard(
+                    id = 2,
+                    icon = R.drawable.outline_house_24,
+                    text = userList[0].address
+                ),
+                UserCard(
+                    id = 3,
+                    icon = R.drawable.outline_list_24,
+                    text = getString(R.string.services_list)
+                )
+            ))
+            recyclerViewButtons.adapter = adapter
+        }
+    }
+
+    private fun setTariffs(tariffsList: List<Tariff>) {
+        activity?.runOnUiThread {
+            val recyclerViewTariff = viewGlobal.findViewById<RecyclerView>(R.id.tariffCards)
+            val tariffAdapter = TariffAdapter()
+            tariffAdapter.submitList(tariffsList)
+            recyclerViewTariff.adapter = tariffAdapter
+        }
+    }
+
+    private fun setAccountData(accountData: List<Balance>) {
+        activity?.runOnUiThread {
+            viewGlobal.findViewById<TextView>(R.id.idNumber).text =
+                accountData[0].id.toString();
+            viewGlobal.findViewById<TextView>(R.id.balanceNumber).text =
+                getString(R.string.money_string, accountData[0].amount)
+            viewGlobal.findViewById<TextView>(R.id.debtNumber).text =
+                getString(R.string.to_pay, "сентябрь", accountData[0].toPay)
+        }
+    }
+
 }
