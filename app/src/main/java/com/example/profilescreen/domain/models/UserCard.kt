@@ -1,4 +1,4 @@
-package com.example.profilescreen.ui.main
+package com.example.profilescreen.domain.models
 
 data class UserCard (
     val id: Int,

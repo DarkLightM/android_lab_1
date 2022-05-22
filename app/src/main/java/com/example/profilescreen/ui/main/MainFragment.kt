@@ -8,11 +8,15 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.example.profilescreen.App
 import com.example.profilescreen.R
-import com.example.profilescreen.api.RetrofitClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.profilescreen.di.MainViewModel
+import com.example.profilescreen.domain.models.Balance
+import com.example.profilescreen.domain.models.Tariff
+import com.example.profilescreen.domain.models.User
+import com.example.profilescreen.domain.models.UserCard
+import com.example.profilescreen.domain.usecases.getBalance.IGetBalanceUseCase
+import javax.inject.Inject
 
 
 class MainFragment : Fragment() {
@@ -22,7 +26,9 @@ class MainFragment : Fragment() {
     }
 
     private lateinit var viewGlobal: View
-    private lateinit var viewModel: MainViewModel
+
+    @Inject
+    lateinit var viewModel: MainViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,51 +37,51 @@ class MainFragment : Fragment() {
         return inflater.inflate(R.layout.main_fragment, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+    override fun onResume() {
+        super.onResume()
+        viewModel.getData()
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewGlobal = view
-
-        CoroutineScope(Dispatchers.IO).launch {
-            setAccountData(RetrofitClient.retrofitService.getBalanceList());
+        App.appComponent.inject(this)
+        viewModel.balance.observe(viewLifecycleOwner) {
+            setAccountData(it)
         }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            setTariffs(RetrofitClient.retrofitService.getTariffsList());
+        viewModel.tariffs.observe(viewLifecycleOwner) {
+            setTariffs(it)
         }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            setUser(RetrofitClient.retrofitService.getUserList());
+        viewModel.user.observe(viewLifecycleOwner) {
+            setUser(it)
         }
     }
 
-    private fun setUser(userList: List<User>) {
+    private fun setUser(user: User) {
         activity?.runOnUiThread {
-            val recyclerViewButtons = viewGlobal.findViewById<RecyclerView>(R.id.userInfo)
+            val recyclerViewCards = viewGlobal.findViewById<RecyclerView>(R.id.userInfo)
             val adapter = UserCardAdapter()
-            adapter.submitList(mutableListOf(
-                UserCard(
-                    id = 1,
-                    icon = R.drawable.ic_person,
-                    text = userList[0].firstName.plus(" ").plus(userList[0].lastName)
-                ),
-                UserCard(
-                    id = 2,
-                    icon = R.drawable.outline_house_24,
-                    text = userList[0].address
-                ),
-                UserCard(
-                    id = 3,
-                    icon = R.drawable.outline_list_24,
-                    text = getString(R.string.services_list)
+            adapter.submitList(
+                mutableListOf(
+                    UserCard(
+                        id = 1,
+                        icon = R.drawable.ic_person,
+                        text = user.firstName.plus(" ").plus(user.lastName)
+                    ),
+                    UserCard(
+                        id = 2,
+                        icon = R.drawable.outline_house_24,
+                        text = user.address
+                    ),
+                    UserCard(
+                        id = 3,
+                        icon = R.drawable.outline_list_24,
+                        text = getString(R.string.services_list)
+                    )
                 )
-            ))
-            recyclerViewButtons.adapter = adapter
+            )
+            recyclerViewCards.adapter = adapter
         }
     }
 
@@ -88,14 +94,14 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun setAccountData(accountData: List<Balance>) {
+    private fun setAccountData(accountData: Balance) {
         activity?.runOnUiThread {
             viewGlobal.findViewById<TextView>(R.id.idNumber).text =
-                accountData[0].id.toString();
+                accountData.id.toString();
             viewGlobal.findViewById<TextView>(R.id.balanceNumber).text =
-                getString(R.string.money_string, accountData[0].amount)
+                getString(R.string.money_string, accountData.amount)
             viewGlobal.findViewById<TextView>(R.id.debtNumber).text =
-                getString(R.string.to_pay, "сентябрь", accountData[0].toPay)
+                getString(R.string.to_pay, "сентябрь", accountData.toPay)
         }
     }
 

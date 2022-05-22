@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.profilescreen.R
+import com.example.profilescreen.domain.models.UserCard
 
 class UserCardAdapter : ListAdapter<UserCard, UserCardAdapter.ViewHolder>(UserButtonDiffCallback()) {
 

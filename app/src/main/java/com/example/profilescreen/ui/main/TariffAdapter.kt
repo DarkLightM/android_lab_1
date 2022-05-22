@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.profilescreen.R
+import com.example.profilescreen.domain.models.Tariff
 
 class TariffAdapter :
     ListAdapter<Tariff, TariffAdapter.ViewHolder>(TariffDiffCallback()) {
